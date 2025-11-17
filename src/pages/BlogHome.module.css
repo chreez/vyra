@@ -1,0 +1,92 @@
+.page {
+  background-color: #ffffff;
+  min-height: 100vh;
+  color: #121212;
+}
+
+.container {
+  padding: var(--spacing-xl) var(--spacing-lg);
+}
+
+.header {
+  border-bottom: 1px solid #e2e2e2;
+  padding-bottom: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.siteTitle {
+  font-family: 'Cheltenham', Georgia, serif;
+  font-weight: 700;
+  font-size: 2.5rem;
+  color: #121212;
+  margin-bottom: var(--spacing-xs);
+}
+
+.tagline {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 0.875rem;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.articleList {
+  max-width: 600px;
+}
+
+.article {
+  padding: var(--spacing-lg) 0;
+}
+
+.articleMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.category {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #121212;
+  letter-spacing: 0.5px;
+}
+
+.date {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 0.6875rem;
+  color: #666;
+}
+
+.articleLink {
+  text-decoration: none;
+  color: inherit;
+}
+
+.articleTitle {
+  font-family: 'Cheltenham', Georgia, serif;
+  font-weight: 700;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  color: #121212;
+  margin-bottom: var(--spacing-md);
+  transition: color var(--transition-fast);
+}
+
+.articleLink:hover .articleTitle {
+  color: #666;
+}
+
+.excerpt {
+  font-family: 'Georgia', serif;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #333;
+  margin-bottom: var(--spacing-lg);
+}
+
+.divider {
+  border-bottom: 1px solid #e2e2e2;
+  margin-top: var(--spacing-lg);
+}
