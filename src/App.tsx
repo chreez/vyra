@@ -1,10 +1,17 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BlogHome } from './pages/BlogHome';
+import { BlogPost } from './pages/BlogPost';
+
 function App() {
   return (
-    <div className="app">
-      <h1>Vyra</h1>
-      <p>Guide website built with React + Vite</p>
-    </div>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<BlogHome />} />
+        <Route path="/blog" element={<BlogHome />} />
+        <Route path="/blog/:slug" element={<BlogPost />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
