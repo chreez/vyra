@@ -23,13 +23,13 @@ export function BlogPost() {
     if (!slug) return;
 
     // Fetch meta.json
-    fetch(`/src/data/blog/${slug}/meta.json`)
+    fetch(`/data/blog/${slug}/meta.json`)
       .then(res => res.json())
       .then(data => setMeta(data))
       .catch(() => setError('Post not found'));
 
     // Fetch article.md
-    fetch(`/src/data/blog/${slug}/article.md`)
+    fetch(`/data/blog/${slug}/article.md`)
       .then(res => res.text())
       .then(text => {
         // Remove frontmatter (everything between --- markers)
