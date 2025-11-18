@@ -66,6 +66,35 @@ This guide is based on the video by [Creator Name].
 [Watch the original video →](https://youtube.com/watch?v={videoId})
 ```
 
+### Netlify Deployment Best Practices
+
+**CRITICAL: Production build requirements**
+
+**Issue 1: TypeScript build failures from obsolete files**
+- **Problem**: Obsolete/refactored components with TypeScript errors prevented deployment
+- **Root cause**: `tsc -b` checks ALL .ts/.tsx files, even unused ones
+- **Solution**: Delete obsolete files immediately after refactoring
+- **Prevention**: Always run `npm run build` locally before pushing
+
+**Issue 2: Runtime data fetching from /src/ directory**
+- **Problem**: `fetch('/src/data/...')` works in dev but returns 404 in production
+- **Root cause**: Vite only serves files from `/public/` in production builds
+- **Solution**: Runtime-fetched data MUST live in `/public/` directory
+- **Rule**:
+  - Static assets loaded at build time → can be in `/src/`
+  - Data fetched at runtime → MUST be in `/public/`
+
+**Data file locations:**
+- ✅ `/public/data/blog/{slug}/` - Runtime-fetched article data (meta.json, article.md)
+- ✅ `/public/blog/{slug}/` - Static assets (images)
+- ❌ `/src/data/blog/{slug}/` - NOT accessible at runtime in production
+
+**Pre-deployment checklist:**
+1. Run `npm run build` locally and verify it passes
+2. Check that all `fetch()` calls reference `/public/` paths (without "/src/")
+3. Delete any obsolete/unused component files
+4. Test the production build locally: `npm run preview`
+
 ### Git Commit Policy
 
 **CRITICAL: Small, logical commits**
