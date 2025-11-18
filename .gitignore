@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# TypeScript build cache
+tsconfig.tsbuildinfo
+
+# YouTube scrape source data (raw materials, not part of app)
+*-vV4XF-VUTb8/
+*-*/metadata.json
+*-*/transcript.txt
+*-*/screenshots/
