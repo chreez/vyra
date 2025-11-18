@@ -14,11 +14,11 @@ interface BlogPost {
 // Later this will be dynamic based on file system or build script
 const posts: BlogPost[] = [
   {
-    slug: '6-laning-mistakes',
-    title: '6 Laning Mistakes You\'re Making Every Game',
-    date: '2024-11-17',
+    slug: 'the-infinite-money-glitch',
+    title: 'The Infinite Money Glitch - Understanding AI\'s Circular Investment Pattern',
+    date: '2025-11-17',
     category: 'finance',
-    excerpt: 'Stop losing lanes to "bad luck" - learn the 6 biggest laning mistakes players make and how to fix them.',
+    excerpt: 'A $100 billion deal between Nvidia and OpenAI reveals a circular investment pattern eerily similar to the 2001 dotcom bubble. Here\'s what it means for your portfolio.',
     published: true,
   },
 ];
