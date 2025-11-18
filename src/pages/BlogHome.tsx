@@ -28,7 +28,7 @@ export function BlogHome() {
 
   return (
     <div className={styles.page}>
-      <Container size="md" className={styles.container}>
+      <Container size="lg" className={styles.container}>
         <header className={styles.header}>
           <Title order={1} className={styles.siteTitle}>Vyra</Title>
           <Text className={styles.tagline}>Guides & Insights</Text>
