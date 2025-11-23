@@ -8,9 +8,17 @@ You are processing a YouTube video scrape into a blog article. Follow these step
 
 ## Input Path
 
-The user will provide a path like: `scrapes/{video-slug}`
+**IMPORTANT:** The user can invoke this command in two ways:
+1. **With argument:** `/generate-article scrapes/{video-slug}` - Process specific scrape
+2. **Without argument:** `/generate-article` - Automatically process the most recently modified directory in `scrapes/`
 
-This directory contains:
+**First step:** If no argument provided, find the most recent scrape:
+- List all directories in `scrapes/` (exclude files, exclude directories starting with `.`)
+- Sort by modification time (newest first)
+- Use the most recent directory as the input path
+- Report which scrape you selected
+
+The input directory contains:
 - `metadata.json` - Full YouTube metadata (video ID, title, thumbnail, heatmap, upload date)
 - `transcript.txt` - Complete video transcript with timestamps
 - `screenshots/` - Directory with timestamped images (format: `HH-MM-SS.jpg`)
