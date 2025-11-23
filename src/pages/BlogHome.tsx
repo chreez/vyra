@@ -14,6 +14,14 @@ interface BlogPost {
 // Later this will be dynamic based on file system or build script
 const posts: BlogPost[] = [
   {
+    slug: 'ai-adversarial-prompting',
+    title: '8 Ways to Use AI When Someone Is Trying to Screw You (Adversarial Prompting)',
+    date: '2025-11-23',
+    category: 'finance',
+    excerpt: 'How AI helped reduce a $195,000 medical bill to $30,000 by identifying Medicare violations—and how you can use the same techniques against hospitals, debt collectors, and other institutions.',
+    published: true,
+  },
+  {
     slug: 'the-infinite-money-glitch',
     title: 'The Infinite Money Glitch - Understanding AI\'s Circular Investment Pattern',
     date: '2025-11-17',
