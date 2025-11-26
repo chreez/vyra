@@ -83,6 +83,10 @@ export function BlogPost() {
             <ReactMarkdown>{content}</ReactMarkdown>
           </div>
         </article>
+
+        <Link to="/" className={styles.backLink}>
+          ← Back to articles
+        </Link>
       </Container>
     </div>
   );
