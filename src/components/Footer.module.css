@@ -1,0 +1,53 @@
+.footer {
+  background-color: #121212;
+  border-top: 1px solid #333;
+  padding: 1.25rem 0;
+  margin-top: auto;
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.name {
+  font-family: "Georgia", "Times New Roman", serif;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #f5f5f5;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.link {
+  color: #999;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+.link:hover {
+  color: #f5f5f5;
+}
+
+.copyright {
+  font-size: 0.75rem;
+  color: #666;
+  font-family: "Arial", sans-serif;
+}
+
+@media (max-width: 480px) {
+  .container {
+    flex-direction: column;
+    gap: 0.75rem;
+    text-align: center;
+  }
+}
