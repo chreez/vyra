@@ -21,28 +21,53 @@ This workspace was created for AI-assisted development using Claude Code.
 
 **Output:** Two mirrored folders in vyra project:
 
-1. **Content:** `src/data/blog/{slug}/`
+1. **Content:** `public/data/blog/{slug}/`
    - `article.md` - Frontmatter + markdown body
-   - `meta.json` - `{ title, date, category, videoId, published: boolean }`
+   - `meta.json` - See structure below
 
 2. **Assets:** `public/blog/{slug}/`
    - Selected images (hero.jpg, screenshot-1.jpg, etc.)
    - **CRITICAL: Folder name must exactly match content folder**
+
+**meta.json structure:**
+```json
+{
+  "title": "Short Title (avoid full width on mobile)",
+  "date": "YYYY-MM-DD",
+  "category": "health|finance|technology|education",
+  "videoId": "YouTube video ID",
+  "published": true,
+  "excerpt": "1-2 sentence summary for blog listing"
+}
+```
+
+**Blog manifest:** `public/data/blog/index.json`
+- Array of all blog slugs: `["slug-1", "slug-2", ...]`
+- **MUST be updated when adding new articles**
+- BlogHome fetches this to discover all posts dynamically
 
 **Image references in article.md:**
 ```markdown
 ![Description](/blog/{slug}/hero.jpg)
 ```
 
-**Workflow:**
-1. Raw data generated externally → `youtube-image-grabber/`
-2. LLM processes raw data → generates article in target structure
-3. Article + selected images → stored in vyra (mirrored folders)
-4. Website displays published articles only (where `meta.json` has `published: true`)
+**Publishing workflow:**
+1. Raw data generated externally → `scrapes/{video-slug}/`
+2. Run `/generate-article` → creates curated output in scrapes folder
+3. Copy to publish locations:
+   - `public/data/blog/{slug}/article.md`
+   - `public/data/blog/{slug}/meta.json`
+   - `public/blog/{slug}/*.jpg`
+4. **Add slug to `public/data/blog/index.json`**
+5. Set `published: true` in meta.json
+6. Run `npm run build` to verify
+7. Website displays published articles automatically
 
 **Categories:**
-- Start with single category: `finance`
-- Future categories TBD
+- `finance` - Economics, business, investing, markets
+- `health` - Medical, wellness, fitness, mental health
+- `technology` - Tech trends, software, hardware, AI
+- `education` - Tutorials, how-to, learning
 
 **YouTube Attribution (CRITICAL):**
 - All articles are summaries/guides based on YouTube videos
