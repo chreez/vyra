@@ -1,38 +1,65 @@
-import { Container, Title, Text, Anchor } from '@mantine/core';
+import { useEffect, useState } from 'react';
+import { Container, Title, Text, Anchor, Loader } from '@mantine/core';
 import styles from './BlogHome.module.css';
 
-interface BlogPost {
-  slug: string;
+interface BlogMeta {
   title: string;
   date: string;
   category: string;
-  excerpt: string;
+  videoId: string;
   published: boolean;
+  excerpt: string;
 }
 
-// For now, manually import the sample post
-// Later this will be dynamic based on file system or build script
-const posts: BlogPost[] = [
-  {
-    slug: 'ai-adversarial-prompting',
-    title: '8 Ways to Use AI When Someone Is Trying to Screw You (Adversarial Prompting)',
-    date: '2025-11-23',
-    category: 'finance',
-    excerpt: 'How AI helped reduce a $195,000 medical bill to $30,000 by identifying Medicare violations—and how you can use the same techniques against hospitals, debt collectors, and other institutions.',
-    published: true,
-  },
-  {
-    slug: 'the-infinite-money-glitch',
-    title: 'The Infinite Money Glitch - Understanding AI\'s Circular Investment Pattern',
-    date: '2025-11-17',
-    category: 'finance',
-    excerpt: 'A $100 billion deal between Nvidia and OpenAI reveals a circular investment pattern eerily similar to the 2001 dotcom bubble. Here\'s what it means for your portfolio.',
-    published: true,
-  },
-];
+interface BlogPost extends BlogMeta {
+  slug: string;
+}
 
 export function BlogHome() {
-  const publishedPosts = posts.filter(post => post.published);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadPosts() {
+      try {
+        // Fetch the manifest of all blog slugs
+        const manifestRes = await fetch('/data/blog/index.json');
+        const slugs: string[] = await manifestRes.json();
+
+        // Fetch meta.json for each slug
+        const postPromises = slugs.map(async (slug) => {
+          const metaRes = await fetch(`/data/blog/${slug}/meta.json`);
+          const meta: BlogMeta = await metaRes.json();
+          return { ...meta, slug };
+        });
+
+        const allPosts = await Promise.all(postPromises);
+
+        // Filter published and sort by date (newest first)
+        const publishedPosts = allPosts
+          .filter(post => post.published)
+          .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
+        setPosts(publishedPosts);
+      } catch (error) {
+        console.error('Failed to load blog posts:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadPosts();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className={styles.page}>
+        <Container size="lg" className={styles.container}>
+          <Loader size="lg" />
+        </Container>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.page}>
@@ -43,7 +70,7 @@ export function BlogHome() {
         </header>
 
         <main className={styles.articleList}>
-          {publishedPosts.map((post) => (
+          {posts.map((post) => (
             <article key={post.slug} className={styles.article}>
               <div className={styles.articleMeta}>
                 <Text className={styles.category}>{post.category.toUpperCase()}</Text>
