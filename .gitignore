@@ -31,3 +31,4 @@ tsconfig.tsbuildinfo
 *-*/metadata.json
 *-*/transcript.txt
 *-*/screenshots/
+scrapes/

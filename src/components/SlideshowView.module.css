@@ -175,6 +175,13 @@
   background: rgba(255, 255, 255, 0.4);
 }
 
+/* Slide indicator for many slides */
+.slideIndicator {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  letter-spacing: 0.05em;
+}
+
 /* Swipe hint */
 .swipeHint {
   text-align: center;

@@ -2,14 +2,24 @@ import { useState, useEffect, useCallback } from 'react';
 import ReactMarkdown from 'react-markdown';
 import styles from './SlideshowView.module.css';
 
-interface Slide {
+interface SlideObject {
   title?: string;
   content: string;
 }
 
+type Slide = string | SlideObject;
+
 interface SlideshowViewProps {
   slides: Slide[];
   articleTitle: string;
+}
+
+// Helper to normalize slide data
+function getSlideContent(slide: Slide): { title?: string; content: string } {
+  if (typeof slide === 'string') {
+    return { content: slide };
+  }
+  return slide;
 }
 
 export function SlideshowView({ slides, articleTitle }: SlideshowViewProps) {
@@ -107,7 +117,7 @@ export function SlideshowView({ slides, articleTitle }: SlideshowViewProps) {
     };
   }, [clickTimeout]);
 
-  const currentSlide = slides[currentIndex];
+  const currentSlide = getSlideContent(slides[currentIndex]);
   const progress = ((currentIndex + 1) / slides.length) * 100;
 
   return (
@@ -166,21 +176,28 @@ export function SlideshowView({ slides, articleTitle }: SlideshowViewProps) {
           ←
         </button>
 
-        <div className={styles.dots}>
-          {slides.map((_, i) => (
-            <button
-              key={i}
-              className={styles.dot}
-              data-active={i === currentIndex}
-              onClick={() => {
-                if (i !== currentIndex) {
-                  goToSlide(i, i > currentIndex ? 'next' : 'prev');
-                }
-              }}
-              aria-label={`Go to slide ${i + 1}`}
-            />
-          ))}
-        </div>
+        {/* Only show dots for 15 or fewer slides */}
+        {slides.length <= 15 ? (
+          <div className={styles.dots}>
+            {slides.map((_, i) => (
+              <button
+                key={i}
+                className={styles.dot}
+                data-active={i === currentIndex}
+                onClick={() => {
+                  if (i !== currentIndex) {
+                    goToSlide(i, i > currentIndex ? 'next' : 'prev');
+                  }
+                }}
+                aria-label={`Go to slide ${i + 1}`}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className={styles.slideIndicator}>
+            {currentIndex + 1} / {slides.length}
+          </div>
+        )}
 
         <button
           className={styles.navButton}

@@ -15,14 +15,9 @@ interface PostMeta {
   excerpt: string;
 }
 
-interface Slide {
-  title?: string;
-  content: string;
-}
-
 interface TiredContent {
   format: 'slides';
-  slides: Slide[];
+  slides: (string | { title?: string; content: string })[];
 }
 
 interface TonesData {
