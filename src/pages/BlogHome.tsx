@@ -3,7 +3,9 @@ import { Container, Title, Text, Anchor, Loader } from '@mantine/core';
 import { IntroSplash } from '../components/IntroSplash';
 import styles from './BlogHome.module.css';
 
-const STORAGE_KEY = 'vyra-intro-dismissed';
+// Version the key to bust cache when needed
+const STORAGE_VERSION = 'v2';
+const STORAGE_KEY = `vyra-intro-dismissed-${STORAGE_VERSION}`;
 
 interface BlogMeta {
   title: string;

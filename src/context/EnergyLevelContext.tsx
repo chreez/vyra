@@ -12,8 +12,10 @@ interface EnergyLevelContextType {
 
 const EnergyLevelContext = createContext<EnergyLevelContextType | null>(null);
 
-const STORAGE_KEY = 'vyra-energy-level';
-const SPLASH_DISMISSED_KEY = 'vyra-energy-splash-dismissed';
+// Version the keys to bust cache when needed
+const STORAGE_VERSION = 'v2';
+const STORAGE_KEY = `vyra-energy-level-${STORAGE_VERSION}`;
+const SPLASH_DISMISSED_KEY = `vyra-energy-splash-dismissed-${STORAGE_VERSION}`;
 
 interface EnergyLevelProviderProps {
   children: ReactNode;
