@@ -292,6 +292,203 @@ du -sh node_modules   # Should be ~130MB
 
 ---
 
+## Multi-Agent Architecture – YouTube Article Generator (Energy Levels v2)
+
+This section documents the conceptual multi-agent architecture for generating YouTube articles with adaptive tone levels. The system produces three variants of each article optimized for different reader energy states.
+
+### Overview
+
+The energy-level system generates articles in three tones from a single content skeleton:
+- **Tired** – Gentle, low-activation prose for fatigued readers
+- **Medium** – Balanced, neutral baseline (canonical variant)
+- **Energized** – Dynamic, engaging prose for high-engagement readers
+
+**Backward Compatibility:** Existing articles should be treated as the **Medium** variant for any future backfill operations.
+
+### Conceptual Subagents
+
+The following describes behavioral roles, not enforced filenames or locations. Implementation details are agnostic to specific file structures.
+
+#### 1. Scrape Reader & Content Skeleton Builder
+
+**Purpose:** Parse YouTube scrape input and produce a neutral content skeleton.
+
+**Input:** YouTube scrape data (wherever it normally resides):
+- `metadata.json` – Video metadata
+- `transcript.txt` – Full transcript
+- `video-context.json` – AI summary (if available)
+- `screenshots/` – Timestamped images (if available)
+
+**Output:** A **neutral content skeleton** containing:
+- Ordered sections with headings
+- Main claims and arguments
+- Evidence/citations for each claim
+- Image placement suggestions with context
+- Source attribution data
+
+**Constraints:**
+- Skeleton is tone-neutral (no stylistic choices)
+- Structure is canonical – all variants must follow it exactly
+- Claims must include justification ("X because Y")
+
+#### 2. Tone Converter – TIRED
+
+**Purpose:** Convert skeleton to tired-tone variant.
+
+**Characteristics:**
+- Gentle, low-activation language
+- Shorter sentences and paragraphs
+- Reduced cognitive load
+- Calm, unhurried pacing
+- Simple vocabulary where possible
+
+**Constraints:**
+- No structural changes – must follow skeleton exactly
+- No content omission – all claims preserved
+- Only linguistic/stylistic transformations allowed
+
+#### 3. Tone Converter – MEDIUM (Normal)
+
+**Purpose:** Convert skeleton to medium-tone variant.
+
+**Characteristics:**
+- Balanced, neutral prose
+- Standard sentence length and pacing
+- Professional but accessible
+- This is the **canonical baseline**
+
+**Constraints:**
+- No structural changes – must follow skeleton exactly
+- This variant is the reference for alignment checking
+- Existing articles are treated as Medium tone
+
+#### 4. Tone Converter – ENERGIZED
+
+**Purpose:** Convert skeleton to energized-tone variant.
+
+**Characteristics:**
+- Dynamic, engaging language
+- Varied sentence rhythm
+- Active voice preferred
+- Slightly higher energy vocabulary
+- Maintains reader engagement
+
+**Constraints:**
+- No structural changes – must follow skeleton exactly
+- No hyperbole or clickbait – preserve meaning and accuracy
+- Energy comes from pacing, not exaggeration
+
+#### 5. Alignment & QA Subagent
+
+**Purpose:** Verify consistency across all three variants.
+
+**Checks:**
+- All three variants match the skeleton structure
+- Same claims appear in all variants
+- Same evidence/citations in all variants
+- Same images referenced at same positions
+- Differences exist only in tone/style, not substance
+
+**Output:** Validation report or error list
+
+#### 6. Packager Subagent
+
+**Purpose:** Package final output in required format.
+
+**Output Schema:**
+```json
+{
+  "tired": "...",
+  "medium": "...",
+  "energized": "..."
+}
+```
+
+**Responsibilities:**
+- Ensure schema compatibility with project conventions
+- Validate JSON structure
+- Prepare files for wherever content normally resides
+
+### Backfill Policy
+
+- Existing articles are classified as **Medium** tone by default
+- Backfill to generate Tired/Energized variants is a separate operation
+- **Backfill is NOT to be executed during documentation sessions**
+
+---
+
+### Energy-Level Processing Pipeline (Conceptual)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     INPUT STAGE                             │
+├─────────────────────────────────────────────────────────────┤
+│  YouTube Scrape Data                                        │
+│  (metadata, transcript, context, screenshots)               │
+│                         │                                   │
+│                         ▼                                   │
+│  ┌─────────────────────────────────────┐                   │
+│  │ Scrape Reader & Skeleton Builder    │                   │
+│  │ • Parse inputs                      │                   │
+│  │ • Extract claims + evidence         │                   │
+│  │ • Structure sections                │                   │
+│  │ • Place images                      │                   │
+│  └─────────────────────────────────────┘                   │
+│                         │                                   │
+│                         ▼                                   │
+│              NEUTRAL CONTENT SKELETON                       │
+└─────────────────────────────────────────────────────────────┘
+                          │
+        ┌─────────────────┼─────────────────┐
+        ▼                 ▼                 ▼
+┌───────────────┐ ┌───────────────┐ ┌───────────────┐
+│ Tone:  TIRED  │ │ Tone: MEDIUM  │ │ Tone:ENERGIZED│
+│               │ │  (Canonical)  │ │               │
+│ • Gentle      │ │ • Balanced    │ │ • Dynamic     │
+│ • Short sent. │ │ • Neutral     │ │ • Engaging    │
+│ • Low-activ.  │ │ • Standard    │ │ • Active      │
+└───────────────┘ └───────────────┘ └───────────────┘
+        │                 │                 │
+        └─────────────────┼─────────────────┘
+                          ▼
+          ┌───────────────────────────────┐
+          │      Alignment & QA           │
+          │ • Verify structure match      │
+          │ • Check claim consistency     │
+          │ • Validate citations          │
+          │ • Confirm image placement     │
+          └───────────────────────────────┘
+                          │
+                          ▼
+          ┌───────────────────────────────┐
+          │         Packager              │
+          │ • Format as JSON              │
+          │ • Schema validation           │
+          │ • Output to standard location │
+          └───────────────────────────────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│                     OUTPUT                                  │
+├─────────────────────────────────────────────────────────────┤
+│  {                                                          │
+│    "tired": "...",                                          │
+│    "medium": "...",                                         │
+│    "energized": "..."                                       │
+│  }                                                          │
+│                                                             │
+│  → Placed in project's standard output location             │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Key Properties:**
+- Single skeleton feeds all three converters in parallel
+- No structural divergence between variants
+- QA stage is mandatory before packaging
+- Output format is schema-compliant JSON
+
+---
+
 ## References
 
 - Template: `/Users/chris/notes/@inbox/SYSTEM-PROMPT-REACT-VITE.md`
