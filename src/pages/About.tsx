@@ -145,6 +145,39 @@ export function About() {
 
             <section className={styles.section}>
               <Title order={2} className={styles.sectionTitle}>
+                Copyright & Fair Use
+              </Title>
+              <Text className={styles.paragraph}>
+                All original video content referenced on this site remains the intellectual
+                property of its respective creators. Vyra does not claim ownership of any
+                source material.
+              </Text>
+              <Text className={styles.paragraph}>
+                Articles on this site constitute <strong>transformative use</strong> under{' '}
+                <Anchor
+                  href="https://www.law.cornell.edu/uscode/text/17/107"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Section 107 of the U.S. Copyright Act
+                </Anchor>
+                . Content is restructured, summarized, and presented in a different medium
+                for purposes of commentary, education, and accessibility — not to replace
+                or compete with the original works.
+              </Text>
+              <Text className={styles.paragraph}>
+                This site is <strong>non-commercial</strong>. No revenue is generated from
+                advertisements, subscriptions, or any other means.
+              </Text>
+              <Text className={styles.paragraph}>
+                <strong>Content creators:</strong> If you would like your content removed
+                or modified, please contact me directly. I respect creators' rights and will
+                promptly honor takedown requests.
+              </Text>
+            </section>
+
+            <section className={styles.section}>
+              <Title order={2} className={styles.sectionTitle}>
                 About Me
               </Title>
               <Text className={styles.paragraph}>
