@@ -2,6 +2,7 @@ import { useParams, Link } from 'react-router-dom';
 import { Container, Title, Text } from '@mantine/core';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
+import { useEnergyLevel } from '../context/EnergyLevelContext';
 import styles from './BlogPost.module.css';
 
 interface PostMeta {
@@ -13,12 +14,25 @@ interface PostMeta {
   excerpt: string;
 }
 
+interface TonesData {
+  tired: string;
+  medium: string;
+  energized: string;
+}
+
+function removeFrontmatter(text: string): string {
+  return text.replace(/^---[\s\S]*?---\n/, '');
+}
+
 export function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
+  const { energyLevel } = useEnergyLevel();
   const [content, setContent] = useState<string>('');
   const [meta, setMeta] = useState<PostMeta | null>(null);
+  const [tones, setTones] = useState<TonesData | null>(null);
   const [error, setError] = useState<string>('');
 
+  // Fetch meta.json and tones.json once
   useEffect(() => {
     if (!slug) return;
 
@@ -28,16 +42,38 @@ export function BlogPost() {
       .then(data => setMeta(data))
       .catch(() => setError('Post not found'));
 
-    // Fetch article.md
+    // Try to fetch tones.json (may not exist for all articles)
+    fetch(`/data/blog/${slug}/tones.json`)
+      .then(res => {
+        if (!res.ok) throw new Error('No tones');
+        return res.json();
+      })
+      .then(data => setTones(data))
+      .catch(() => {
+        // tones.json doesn't exist, that's okay
+        setTones(null);
+      });
+  }, [slug]);
+
+  // Update content when energy level or tones change
+  useEffect(() => {
+    if (!slug) return;
+
+    // If we have tones and an energy level, use the toned content
+    if (tones && energyLevel) {
+      const tonedContent = tones[energyLevel];
+      if (tonedContent) {
+        setContent(removeFrontmatter(tonedContent));
+        return;
+      }
+    }
+
+    // Fall back to article.md
     fetch(`/data/blog/${slug}/article.md`)
       .then(res => res.text())
-      .then(text => {
-        // Remove frontmatter (everything between --- markers)
-        const withoutFrontmatter = text.replace(/^---[\s\S]*?---\n/, '');
-        setContent(withoutFrontmatter);
-      })
+      .then(text => setContent(removeFrontmatter(text)))
       .catch(() => setError('Article content not found'));
-  }, [slug]);
+  }, [slug, energyLevel, tones]);
 
   if (error) {
     return (
