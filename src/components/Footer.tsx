@@ -11,6 +11,10 @@ export function Footer() {
         <Text className={styles.name}>Chris Palmer</Text>
 
         <div className={styles.links}>
+          <Anchor href="/about" className={styles.textLink}>
+            About
+          </Anchor>
+          <span className={styles.separator}>·</span>
           <Anchor
             href="https://www.instagram.com/rhythm_hawk/"
             target="_blank"

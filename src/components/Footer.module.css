@@ -38,6 +38,23 @@
   color: #f5f5f5;
 }
 
+.textLink {
+  color: #999;
+  font-size: 0.8125rem;
+  font-family: "Arial", sans-serif;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.textLink:hover {
+  color: #f5f5f5;
+}
+
+.separator {
+  color: #555;
+  font-size: 0.75rem;
+}
+
 .copyright {
   font-size: 0.75rem;
   color: #666;
