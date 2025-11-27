@@ -7,13 +7,17 @@ interface IntroSplashProps {
 }
 
 export function IntroSplash({ onDismiss }: IntroSplashProps) {
+  const handleLearnMore = () => {
+    onDismiss();
+  };
+
   return (
     <div className={styles.banner}>
       <div className={styles.content}>
         <Text className={styles.text}>
           <strong>Welcome to Vyra</strong> — YouTube videos transformed into readable guides.
           Built with AI as an ADHD-friendly way to consume content.{' '}
-          <Anchor href="/about" className={styles.link}>
+          <Anchor href="/about" className={styles.link} onClick={handleLearnMore}>
             Learn more →
           </Anchor>
         </Text>
