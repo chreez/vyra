@@ -1,6 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Container, Title, Text, Anchor, Loader } from '@mantine/core';
+import { IntroSplash } from '../components/IntroSplash';
 import styles from './BlogHome.module.css';
+
+const STORAGE_KEY = 'vyra-intro-dismissed';
 
 interface BlogMeta {
   title: string;
@@ -18,6 +21,19 @@ interface BlogPost extends BlogMeta {
 export function BlogHome() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showSplash, setShowSplash] = useState(false);
+
+  useEffect(() => {
+    const dismissed = localStorage.getItem(STORAGE_KEY);
+    if (!dismissed) {
+      setShowSplash(true);
+    }
+  }, []);
+
+  const handleDismiss = () => {
+    localStorage.setItem(STORAGE_KEY, 'true');
+    setShowSplash(false);
+  };
 
   useEffect(() => {
     async function loadPosts() {
@@ -63,6 +79,8 @@ export function BlogHome() {
 
   return (
     <div className={styles.page}>
+      {showSplash && <IntroSplash onDismiss={handleDismiss} />}
+
       <Container size="lg" className={styles.container}>
         <header className={styles.header}>
           <Title order={1} className={styles.siteTitle}>Vyra</Title>
