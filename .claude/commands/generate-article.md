@@ -196,3 +196,52 @@ After generating all files:
 ✅ All image references exist
 
 **Focus on quality over speed. Exhaustive coverage beats brevity.**
+
+---
+
+## Energy-Level Article Framework (v2)
+
+This section documents the planned energy-level variant system for future implementation. **No changes to current article generator behavior are required at this time.**
+
+### Overview
+
+The energy-level framework produces three tone variants of each article from a single content skeleton:
+
+| Tone | Description | Use Case |
+|------|-------------|----------|
+| **Tired** | Gentle, low-activation prose | Fatigued readers, nighttime reading |
+| **Medium** | Balanced, neutral baseline | Standard reading, default variant |
+| **Energized** | Dynamic, engaging prose | Active reading, high engagement |
+
+### Output Structure (Future)
+
+When implemented, articles will output a structured format:
+
+```json
+{
+  "tired": "... markdown content ...",
+  "medium": "... markdown content ...",
+  "energized": "... markdown content ..."
+}
+```
+
+### Key Principles
+
+1. **Single Skeleton** – All three variants derive from one neutral content skeleton
+2. **Structure Preserved** – Same sections, claims, citations, and images across all variants
+3. **Tone Only** – Differences are purely stylistic (sentence length, vocabulary, pacing)
+4. **Medium = Canonical** – Existing articles are treated as Medium tone for backfill
+
+### Backward Compatibility
+
+- Current article generator continues to produce single-variant output
+- Existing articles are classified as **Medium** tone by default
+- No modifications to current workflow until implementation phase
+
+### Implementation Status
+
+- **Documented:** Yes (see `docs/spec.md` for full architecture)
+- **Implemented:** No
+- **Backfill executed:** No
+
+**Note:** Backfill and implementation are separate operations not to be executed during documentation sessions.
