@@ -3,6 +3,7 @@ import { Container, Title, Text } from '@mantine/core';
 import ReactMarkdown from 'react-markdown';
 import { useEffect, useState } from 'react';
 import { useEnergyLevel } from '../context/EnergyLevelContext';
+import { SlideshowView } from '../components/SlideshowView';
 import styles from './BlogPost.module.css';
 
 interface PostMeta {
@@ -14,8 +15,18 @@ interface PostMeta {
   excerpt: string;
 }
 
+interface Slide {
+  title?: string;
+  content: string;
+}
+
+interface TiredContent {
+  format: 'slides';
+  slides: Slide[];
+}
+
 interface TonesData {
-  tired: string;
+  tired: string | TiredContent;
   medium: string;
   energized: string;
 }
@@ -63,8 +74,16 @@ export function BlogPost() {
     if (tones && energyLevel) {
       const tonedContent = tones[energyLevel];
       if (tonedContent) {
-        setContent(removeFrontmatter(tonedContent));
-        return;
+        // If it's slides format, don't set content (slideshow handles it)
+        if (typeof tonedContent === 'object' && tonedContent.format === 'slides') {
+          setContent(''); // Clear content, slideshow will render
+          return;
+        }
+        // String format - use as markdown
+        if (typeof tonedContent === 'string') {
+          setContent(removeFrontmatter(tonedContent));
+          return;
+        }
       }
     }
 
@@ -93,8 +112,23 @@ export function BlogPost() {
     );
   }
 
+  // Check if we should show slideshow (tired mode with slides format)
+  const tiredContent = tones?.tired;
+  const showSlideshow = energyLevel === 'tired' &&
+    typeof tiredContent === 'object' &&
+    tiredContent?.format === 'slides';
+
+  if (showSlideshow && tiredContent && 'slides' in tiredContent) {
+    return (
+      <SlideshowView
+        slides={tiredContent.slides}
+        articleTitle={meta.title}
+      />
+    );
+  }
+
   return (
-    <div className={styles.page}>
+    <div className={styles.page} data-energy={energyLevel || 'medium'}>
       <Container size="md" className={styles.container}>
         <Link to="/" className={styles.backLink}>
           ← Back to articles
