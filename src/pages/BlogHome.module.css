@@ -1,7 +1,7 @@
 .page {
-  background-color: #ffffff;
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
   min-height: 100vh;
-  color: #121212;
+  color: var(--text-primary);
 }
 
 .container {
@@ -9,7 +9,7 @@
 }
 
 .header {
-  border-bottom: 1px solid #e2e2e2;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
 }
@@ -18,14 +18,14 @@
   font-family: 'Cheltenham', Georgia, serif;
   font-weight: 700;
   font-size: 2.5rem;
-  color: #121212;
+  color: var(--text-primary);
   margin-bottom: var(--spacing-xs);
 }
 
 .tagline {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 0.875rem;
-  color: #666;
+  color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -49,14 +49,14 @@
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 0.6875rem;
   font-weight: 700;
-  color: #121212;
+  color: #9b8fc4;
   letter-spacing: 0.5px;
 }
 
 .date {
   font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
   font-size: 0.6875rem;
-  color: #666;
+  color: var(--text-secondary);
 }
 
 .articleLink {
@@ -69,24 +69,24 @@
   font-weight: 700;
   font-size: 1.75rem;
   line-height: 1.2;
-  color: #121212;
+  color: var(--text-primary);
   margin-bottom: var(--spacing-md);
   transition: color var(--transition-fast);
 }
 
 .articleLink:hover .articleTitle {
-  color: #666;
+  color: #9b8fc4;
 }
 
 .excerpt {
   font-family: 'Georgia', serif;
   font-size: 0.9375rem;
   line-height: 1.5;
-  color: #333;
+  color: var(--text-secondary);
   margin-bottom: var(--spacing-lg);
 }
 
 .divider {
-  border-bottom: 1px solid #e2e2e2;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-top: var(--spacing-lg);
 }
