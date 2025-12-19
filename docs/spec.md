@@ -71,7 +71,7 @@ Located in `src/styles/tokens.css`:
 ## Blog System Architecture
 
 ### Content Workflow
-1. **External generation:** Raw YouTube data → `/Users/chris/workspace/youtube-image-grabber/{video-slug}/`
+1. **External generation:** Raw YouTube data → `scrapes/{video-slug}/`
    - `metadata.json` - YouTube metadata (id, title, formats, thumbnail URLs)
    - `video-context.json` - AI summary, topics
    - `transcript.txt` - Full video transcript

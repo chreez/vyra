@@ -4,9 +4,18 @@ description: Generate blog article from YouTube scrape data
 
 # YouTube Article Generator
 
-You are processing a YouTube video scrape into a blog article. Follow these steps:
+You are processing a YouTube video scrape into a blog article with automated preview and two-phase publishing.
 
-## Input Path
+**Workflow Overview:**
+1. Generate balanced (medium tone) article
+2. Preview and first review
+3. Generate energy variants (tired/medium/energized)
+4. Second review
+5. Publish
+
+---
+
+## Step 1: Input Path
 
 **IMPORTANT:** The user can invoke this command in two ways:
 1. **With argument:** `/generate-article scrapes/{video-slug}` - Process specific scrape
@@ -25,82 +34,87 @@ The input directory contains:
 - Optional: `screenshots/screenshot-metadata.jsonl` - AI analysis of screenshots
 - Optional: `video-context.json` - AI-generated video summary
 
-## Output Structure
+---
 
-Create TWO outputs:
+## Step 2: Analysis & Confirmation
 
-### 1. Curated artifacts (for review)
-`{input-directory}/curated/`
+After loading all files, present a confirmation summary:
+
+```
+📹 Video: [Title]
+👤 Channel: [Channel name]
+⏱️ Duration: [MM:SS]
+📝 Main Topics: [2-3 themes]
+🖼️ Screenshots: [Count]
+📊 AI Analysis: Available [✓/✗]
+
+Proposed Article Structure:
+- Overview: [Thesis in 1-2 sentences]
+- Main Arguments: [3-5 bullet points]
+- Hero Image Candidates: [Count]
+```
+
+Ask user: **"Proceed with article generation? (yes/no)"**
+
+Only continue after confirmation.
+
+---
+
+## Step 3: Generate Balanced Article
+
+Generate a single "balanced" (medium tone) article.
+
+### Output Structure
+
+Create `{input-directory}/curated/`:
 ```
 curated/
-├── article.md
+├── article.md          # Balanced/medium tone
 ├── metadata.json
 └── images/
     ├── hero-candidate-1.jpg
     ├── hero-candidate-2.jpg
-    ├── hero-candidate-3.jpg
     ├── [descriptive-name].jpg
     └── image-selection-metadata.json
 ```
 
-### 2. Vyra structure (for deployment)
-```
-public/data/blog/{slug}/
-├── article.md
-└── meta.json
+### article.md Format
 
-public/blog/{slug}/
-└── [all curated images]
-```
-
-## Article Format
-
-**article.md structure:**
 ```markdown
 ---
 title: [Extracted from video title]
 description: [1-2 sentence summary]
 ---
 
-# [Article Title]
-
 ## Overview
 [2-3 paragraphs explaining the video's core argument/thesis]
 
-## Main Arguments
-
-### [Point 1: Claim]
+## [Main Point 1]
 [Evidence and reasoning - de-duplicated, no rambling]
 
 ![Description](/blog/{slug}/image-name.jpg)
 
-[Source citations if mentioned in video]
-
-### [Point 2: Claim]
+## [Main Point 2]
 [Evidence and reasoning]
 
 ...
 
 ## Key Takeaways
-- [Actionable/memorable bullet points]
-- [Main conclusions without fluff]
-
-## Sources Referenced
-- [Any articles, studies, data mentioned in video]
-- [Include timestamps if specific]
+- [Actionable bullet points]
+- [Main conclusions]
 
 ---
 
 ## Source
 
-This guide is based on the video by [Creator Name from metadata].
+This guide is based on the video by [Creator Name].
 
-[![Video Title](thumbnail-url-from-metadata)](https://youtube.com/watch?v={videoId})
+[![Video Title](https://img.youtube.com/vi/{videoId}/maxresdefault.jpg)](https://youtube.com/watch?v={videoId})
 
 [Watch the original video →](https://youtube.com/watch?v={videoId})
 ```
 
-## Content Requirements
+### Content Requirements
 
 1. **De-duplicate** - Videos repeat points. State each argument once, clearly.
 2. **Extract claims + justifications** - Use "X is true BECAUSE Y" structure
@@ -109,139 +123,253 @@ This guide is based on the video by [Creator Name from metadata].
 5. **Preserve nuance** - Keep caveats and counter-arguments if mentioned
 6. **Be exhaustive** - Cover ALL major points, not just highlights
 
-## Metadata Files
+### metadata.json
 
-**curated/metadata.json:**
 ```json
 {
-  "title": "string - video title",
-  "date": "YYYY-MM-DD - curation date (today)",
-  "category": "string - auto-categorized",
-  "videoId": "string - from parent metadata.json",
-  "published": false
+  "title": "Short Title (mobile-friendly)",
+  "date": "YYYY-MM-DD",
+  "category": "health|finance|technology|education",
+  "videoId": "YouTube video ID",
+  "published": false,
+  "excerpt": "1-2 sentence summary for blog listing",
+  "scrapePath": "scrapes/{video-slug}"
 }
 ```
 
-**public/data/blog/{slug}/meta.json** (same content, just copied)
+Note: `scrapePath` is stored so variant generation can reference original source material.
 
 **Categories:**
 - `finance` - Economics, business, investing, markets
+- `health` - Medical, wellness, fitness, mental health
 - `technology` - Tech trends, software, hardware, AI
 - `education` - Tutorials, how-to, learning
-- `analysis` - Deep dives, research, investigative
-- `commentary` - Opinion, reaction, discussion
 
-## Image Selection
+### Image Selection
 
-**Hero Candidates (1-5 images):**
+**Hero Candidates (2-3 images):**
 - Name as: `hero-candidate-1.jpg`, `hero-candidate-2.jpg`, etc.
-- Criteria: High engagement (heatmap), visual impact, represents content
+- Criteria: Text overlays, charts, diagrams > talking head shots
 
 **Article Images:**
-- Use **descriptive filenames**: `chart-revenue-growth.jpg`, `quote-expert.jpg`
-- Criteria: Shows data/charts, contains text, illustrates key points
+- Use **descriptive filenames**: `chart-revenue.jpg`, `quote-expert.jpg`
+- Prefer images with visible text or data visualization
 
-**image-selection-metadata.json:**
+---
+
+## Step 4: Deploy to Preview
+
+After generating curated output, automatically deploy for preview:
+
+### Generate Slug
+- Create URL-safe slug from video title
+- Format: lowercase, hyphenated, no special characters
+- Max 50 characters
+- Example: "How Digital Habits Weaken Your Brain" → `digital-habits-weaken-brain`
+
+### Copy Files
+1. Create directories:
+   - `public/data/blog/{slug}/`
+   - `public/blog/{slug}/`
+
+2. Copy content files:
+   - `curated/article.md` → `public/data/blog/{slug}/article.md`
+   - `curated/metadata.json` → `public/data/blog/{slug}/meta.json`
+
+3. Copy images:
+   - `curated/images/*.jpg` → `public/blog/{slug}/`
+   - Rename `hero-candidate-1.jpg` to `hero.jpg`
+
+4. Update manifest:
+   - Read `public/data/blog/index.json`
+   - Add new slug to array (if not already present)
+   - Write updated array back
+
+5. Verify `published: false` in meta.json
+
+---
+
+## Step 5: Browser Preview (First Review)
+
+### Start Dev Server
+1. Check if dev server is running:
+   - Use `lsof -i :5173` or `lsof -i :5175`
+2. If not running:
+   - Start with `npm run dev` in background
+   - Wait for "ready" message (typically 2-3 seconds)
+
+### Verify with Chrome DevTools
+1. Use `mcp__chrome-devtools__navigate_page` to load `http://localhost:5173/blog/{slug}`
+2. Use `mcp__chrome-devtools__take_snapshot` to verify content renders
+3. Use `mcp__chrome-devtools__list_console_messages` to check for errors
+4. If errors found, report them but continue
+
+### Open in System Browser
+Run: `open http://localhost:5173/blog/{slug}`
+
+Report to user:
+```
+✅ Balanced article deployed to preview
+📍 Location: public/data/blog/{slug}/
+🌐 Preview: http://localhost:5173/blog/{slug}
+
+Opening in your browser now...
+```
+
+---
+
+## Step 6: First Review - Generate Variants?
+
+Ask user: **"Balanced article preview is open. Ready to generate energy variants? (yes/no)"**
+
+### If No:
+Keep as draft, stop here:
+```
+📝 Article saved as draft (balanced only).
+📍 Location: public/data/blog/{slug}/
+🔧 Run /backfill-energy-variants {slug} later to add variants.
+```
+
+### If Yes:
+Continue to Step 7.
+
+---
+
+## Step 7: Generate Energy Variants
+
+Using the balanced article AND the original source material (transcript, video-context), generate three tone variants:
+
+### Read Source Material
+- Read `{scrapePath}/transcript.txt`
+- Read `{scrapePath}/video-context.json` (if exists)
+- Use these to ensure variants capture nuance from original content
+
+### Generate Variants
+
+1. **Tired**
+   - Gentle, low-activation tone
+   - Shorter sentences and paragraphs
+   - Slide-based format for tired mode (see format below)
+   - Calmer pacing, simpler phrasing
+   - Same sections, claims, citations, images, attribution
+
+2. **Medium** (copy of balanced article)
+   - This is the article.md content
+
+3. **Energized**
+   - Dynamic, engaging tone
+   - Varied sentence rhythm, higher energy
+   - No exaggeration or new claims
+   - Same sections, claims, citations, images, attribution
+
+### Tired Mode Slide Format
+
+For tired mode, convert to slides:
 ```json
 {
-  "hero_candidates": [
-    {
-      "filename": "hero-candidate-1.jpg",
-      "original_timestamp": "HH-MM-SS",
-      "confidence": 0.95,
-      "selection_reason": "Heatmap peak (0.95) + chart showing revenue data",
-      "description": "Revenue growth comparison chart",
-      "heatmap_value": 0.85,
-      "scene_type": "chart"
-    }
-  ],
-  "article_images": [
-    {
-      "filename": "chart-revenue-growth.jpg",
-      "original_timestamp": "HH-MM-SS",
-      "confidence": 0.90,
-      "selection_reason": "Supports main argument about revenue",
-      "description": "Oracle revenue growth comparison",
-      "heatmap_value": 0.85,
-      "scene_type": "chart",
-      "suggested_placement": "section_2",
-      "supports_argument": "Oracle's revenue growth strategy"
-    }
+  "format": "slides",
+  "slides": [
+    "# Slide Title\n\nShort, gentle content for slide 1",
+    "## Key Point\n\nSimple explanation",
+    ...
   ]
 }
 ```
 
-## Final Steps
+Each slide should be:
+- One key idea
+- 2-4 sentences max
+- Soothing, low-stimulation language
 
-After generating all files:
+### Write tones.json
 
-1. **Update BlogHome.tsx** - Add new article to posts array (keep alphabetical by date, newest first)
-2. **Set published: false** - Requires manual review before publishing
-3. **Report outputs:**
-   - Curated artifacts location
-   - Vyra structure location
-   - Localhost link: `http://localhost:5173/blog/{slug}`
-
-## Quality Checklist
-
-✅ Core argument clear in first 3 paragraphs
-✅ Every major point covered
-✅ No rambling or circular logic
-✅ Sources cited with context
-✅ 1-5 strong hero candidates
-✅ Descriptive image filenames
-✅ Valid metadata JSON
-✅ Complete YouTube attribution
-✅ BlogHome.tsx updated
-✅ All image references exist
-
-**Focus on quality over speed. Exhaustive coverage beats brevity.**
-
----
-
-## Energy-Level Article Framework (v2)
-
-This section documents the planned energy-level variant system for future implementation. **No changes to current article generator behavior are required at this time.**
-
-### Overview
-
-The energy-level framework produces three tone variants of each article from a single content skeleton:
-
-| Tone | Description | Use Case |
-|------|-------------|----------|
-| **Tired** | Gentle, low-activation prose | Fatigued readers, nighttime reading |
-| **Medium** | Balanced, neutral baseline | Standard reading, default variant |
-| **Energized** | Dynamic, engaging prose | Active reading, high engagement |
-
-### Output Structure (Future)
-
-When implemented, articles will output a structured format:
-
+Create `public/data/blog/{slug}/tones.json`:
 ```json
 {
-  "tired": "... markdown content ...",
-  "medium": "... markdown content ...",
-  "energized": "... markdown content ..."
+  "tired": {
+    "format": "slides",
+    "slides": ["...", "...", "..."]
+  },
+  "medium": "FULL MARKDOWN OF BALANCED ARTICLE",
+  "energized": "FULL MARKDOWN OF ENERGIZED VARIANT"
 }
 ```
 
-### Key Principles
+---
 
-1. **Single Skeleton** – All three variants derive from one neutral content skeleton
-2. **Structure Preserved** – Same sections, claims, citations, and images across all variants
-3. **Tone Only** – Differences are purely stylistic (sentence length, vocabulary, pacing)
-4. **Medium = Canonical** – Existing articles are treated as Medium tone for backfill
+## Step 8: Browser Preview (Second Review)
 
-### Backward Compatibility
+### Reload and Verify
+1. Use Chrome DevTools to reload `http://localhost:5173/blog/{slug}`
+2. Take snapshot to verify tones.json is being used
+3. Test tired mode by setting energy level (if possible via DevTools)
 
-- Current article generator continues to produce single-variant output
-- Existing articles are classified as **Medium** tone by default
-- No modifications to current workflow until implementation phase
+### Open in System Browser
+Run: `open http://localhost:5173/blog/{slug}`
 
-### Implementation Status
+Report to user:
+```
+✅ Energy variants generated
+📍 tones.json created at: public/data/blog/{slug}/tones.json
+🌐 Preview: http://localhost:5173/blog/{slug}
 
-- **Documented:** Yes (see `docs/spec.md` for full architecture)
-- **Implemented:** No
-- **Backfill executed:** No
+Opening in your browser now...
+Test different energy levels to review variants.
+```
 
-**Note:** Backfill and implementation are separate operations not to be executed during documentation sessions.
+---
+
+## Step 9: Publish Confirmation
+
+Ask user: **"Variants are ready. Publish article? (yes/no)"**
+
+### If Yes:
+1. Update `public/data/blog/{slug}/meta.json`: set `"published": true`
+2. Archive the source scrape:
+   ```bash
+   mkdir -p scrapes/archive
+   mv {scrapePath} scrapes/archive/
+   ```
+3. Create git commit and push:
+   ```bash
+   git add public/data/blog/{slug}/ public/blog/{slug}/ public/data/blog/index.json
+   git commit -m "content: Add {article-title} article"
+   git push origin
+   ```
+4. Confirm:
+```
+✅ Article published!
+📍 Available at: /blog/{slug}
+📊 Variants: tired (slides), medium, energized
+📦 Committed and pushed to origin
+🗄️ Scrape archived to: scrapes/archive/{scrape-folder-name}
+```
+
+### If No:
+1. Keep `published: false`
+2. Confirm:
+```
+📝 Article saved as draft with variants.
+📍 Location: public/data/blog/{slug}/
+🔧 To publish: set "published": true in meta.json
+```
+
+---
+
+## Quality Checklist
+
+✅ Core argument clear in overview
+✅ Every major point covered
+✅ No rambling or circular logic
+✅ Sources cited with context
+✅ 2-3 strong hero candidates
+✅ Descriptive image filenames
+✅ Valid metadata JSON
+✅ Complete YouTube attribution
+✅ index.json updated
+✅ All image references exist
+✅ Preview renders without errors
+✅ All three tone variants aligned (same claims, different tone)
+✅ Tired mode uses slides format
+✅ Source scrape archived to scrapes/archive/
+✅ Changes committed and pushed to origin

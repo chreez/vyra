@@ -13,7 +13,7 @@ This workspace was created for AI-assisted development using Claude Code.
 
 ### Article Generation from Raw YouTube Data
 
-**Input:** `/Users/chris/workspace/youtube-image-grabber/{video-slug}/`
+**Input:** `scrapes/{video-slug}/`
 - `metadata.json` - YouTube metadata (id, title, formats)
 - `video-context.json` - AI summary, topics
 - `transcript.txt` - Full video transcript
