@@ -304,7 +304,24 @@ Convert the balanced article into slide format:
 - Gentle, low-activation tone
 - Shorter sentences and paragraphs
 - Calmer pacing, simpler phrasing
-- Same sections, claims, citations, images, attribution
+- Same sections, claims, citations, attribution
+
+### Image Resampling for Slides
+
+**IMPORTANT:** Reassess available images specifically for slide format. Don't just copy images from the balanced article.
+
+1. **Re-read screenshot metadata** from `{scrapePath}/screenshots/screenshot-metadata.jsonl`
+2. **Map slides to images:**
+   - For each slide topic, identify if a relevant image exists
+   - Prioritize images that demonstrate: exercises, diagrams, frameworks, examples
+   - Skip talking heads unless showing technique
+3. **Ensure distinctiveness:**
+   - No near-duplicate images (e.g., same pose from different angles)
+   - Each image should add unique visual information
+4. **Copy additional images if needed:**
+   - If resampling identifies useful images not in `public/blog/{slug}/`, copy them
+   - Use descriptive filenames matching the slide content
+5. **Target coverage:** Aim for images on 30-50% of slides where visuals add value
 
 ### Tired Mode Slide Format
 
