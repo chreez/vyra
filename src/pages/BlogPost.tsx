@@ -23,7 +23,6 @@ interface TiredContent {
 interface TonesData {
   tired: string | TiredContent;
   medium: string;
-  energized: string;
 }
 
 function removeFrontmatter(text: string): string {
@@ -32,7 +31,7 @@ function removeFrontmatter(text: string): string {
 
 export function BlogPost() {
   const { slug } = useParams<{ slug: string }>();
-  const { energyLevel } = useEnergyLevel();
+  const { energyLevel, setHasVariants } = useEnergyLevel();
   const [content, setContent] = useState<string>('');
   const [meta, setMeta] = useState<PostMeta | null>(null);
   const [tones, setTones] = useState<TonesData | null>(null);
@@ -42,24 +41,43 @@ export function BlogPost() {
   useEffect(() => {
     if (!slug) return;
 
+    const abortController = new AbortController();
+
+    // Reset hasVariants to true before fetching (prevents stale state)
+    setHasVariants(true);
+
     // Fetch meta.json
-    fetch(`/data/blog/${slug}/meta.json`)
+    fetch(`/data/blog/${slug}/meta.json`, { signal: abortController.signal })
       .then(res => res.json())
       .then(data => setMeta(data))
-      .catch(() => setError('Post not found'));
+      .catch(err => {
+        if (err.name !== 'AbortError') setError('Post not found');
+      });
 
     // Try to fetch tones.json (may not exist for all articles)
-    fetch(`/data/blog/${slug}/tones.json`)
+    fetch(`/data/blog/${slug}/tones.json`, { signal: abortController.signal })
       .then(res => {
         if (!res.ok) throw new Error('No tones');
         return res.json();
       })
-      .then(data => setTones(data))
-      .catch(() => {
-        // tones.json doesn't exist, that's okay
-        setTones(null);
+      .then(data => {
+        setTones(data);
+        setHasVariants(true);
+      })
+      .catch(err => {
+        if (err.name !== 'AbortError') {
+          // tones.json doesn't exist, that's okay
+          setTones(null);
+          setHasVariants(false);
+        }
       });
-  }, [slug]);
+
+    // Cleanup: abort pending requests and reset hasVariants for non-article pages
+    return () => {
+      abortController.abort();
+      setHasVariants(true);
+    };
+  }, [slug, setHasVariants]);
 
   // Update content when energy level or tones change
   useEffect(() => {

@@ -9,7 +9,7 @@ You are processing a YouTube video scrape into a blog article with automated pre
 **Workflow Overview:**
 1. Generate balanced (medium tone) article
 2. Preview and first review
-3. Generate energy variants (tired/medium/energized)
+3. Generate tired variant (slides format)
 4. Second review
 5. Publish
 
@@ -76,6 +76,42 @@ curated/
     ├── hero-candidate-2.jpg
     ├── [descriptive-name].jpg
     └── image-selection-metadata.json
+```
+
+### image-selection-metadata.json Structure
+
+Document the selection process with verbose metadata:
+
+```json
+{
+  "hero_candidates": [
+    {
+      "filename": "hero-candidate-1.jpg",
+      "source": "00-08-00.jpg",
+      "scene_type": "text_overlay",
+      "visible_text": "Key text from image",
+      "selection_reason": "Clear framework diagram matching article thesis",
+      "article_placement": "hero"
+    }
+  ],
+  "article_images": [
+    {
+      "filename": "framework-diagram.jpg",
+      "source": "00-10-00.jpg",
+      "scene_type": "diagram",
+      "visible_text": "Step 1: ...",
+      "selection_reason": "Illustrates main methodology section",
+      "article_placement": "section: Key Steps"
+    }
+  ],
+  "selection_summary": {
+    "metadata_source": "screenshot-metadata.jsonl",
+    "total_screenshots": 34,
+    "errors_skipped": 2,
+    "talking_heads_excluded": 15,
+    "images_selected": 8
+  }
+}
 ```
 
 ### article.md Format
@@ -147,13 +183,31 @@ Note: `scrapePath` is stored so variant generation can reference original source
 
 ### Image Selection
 
+**IMPORTANT:** Check for `screenshots/screenshot-metadata.jsonl` first.
+
+**If metadata exists** (preferred):
+1. Load the JSONL file (one JSON object per line)
+2. Filter by `scene_type`:
+   - PREFER: "text_overlay", "diagram", "chart", "framework"
+   - AVOID: "talking_head"
+   - SKIP: "error" (note skipped count in output)
+3. Rank by `visible_text` presence (images with clear text score higher)
+4. Use `description` to identify key concepts matching article sections
+5. Use `relates_to_audio` to match images with relevant transcript sections
+
+**If metadata doesn't exist** (fallback):
+- Analyze screenshots by timestamp distribution
+- Prefer images at key moments (intro, transitions, conclusions)
+- Prioritize visible text/diagrams over talking head shots
+
 **Hero Candidates (2-3 images):**
+- Select images with highest information density
+- Match to article overview/thesis
 - Name as: `hero-candidate-1.jpg`, `hero-candidate-2.jpg`, etc.
-- Criteria: Text overlays, charts, diagrams > talking head shots
 
 **Article Images:**
-- Use **descriptive filenames**: `chart-revenue.jpg`, `quote-expert.jpg`
-- Prefer images with visible text or data visualization
+- Match images to specific article sections using `description`/`visible_text`
+- Use **descriptive filenames**: `chart-revenue.jpg`, `framework-diagram.jpg`
 
 ---
 
@@ -235,36 +289,25 @@ Continue to Step 7.
 
 ---
 
-## Step 7: Generate Energy Variants
+## Step 7: Generate Tired Variant
 
-Using the balanced article AND the original source material (transcript, video-context), generate three tone variants:
+Using the balanced article AND the original source material (transcript, video-context), generate the tired variant:
 
 ### Read Source Material
 - Read `{scrapePath}/transcript.txt`
 - Read `{scrapePath}/video-context.json` (if exists)
-- Use these to ensure variants capture nuance from original content
+- Use these to ensure the variant captures nuance from original content
 
-### Generate Variants
+### Generate Tired Variant
 
-1. **Tired**
-   - Gentle, low-activation tone
-   - Shorter sentences and paragraphs
-   - Slide-based format for tired mode (see format below)
-   - Calmer pacing, simpler phrasing
-   - Same sections, claims, citations, images, attribution
-
-2. **Medium** (copy of balanced article)
-   - This is the article.md content
-
-3. **Energized**
-   - Dynamic, engaging tone
-   - Varied sentence rhythm, higher energy
-   - No exaggeration or new claims
-   - Same sections, claims, citations, images, attribution
+Convert the balanced article into slide format:
+- Gentle, low-activation tone
+- Shorter sentences and paragraphs
+- Calmer pacing, simpler phrasing
+- Same sections, claims, citations, images, attribution
 
 ### Tired Mode Slide Format
 
-For tired mode, convert to slides:
 ```json
 {
   "format": "slides",
@@ -290,8 +333,7 @@ Create `public/data/blog/{slug}/tones.json`:
     "format": "slides",
     "slides": ["...", "...", "..."]
   },
-  "medium": "FULL MARKDOWN OF BALANCED ARTICLE",
-  "energized": "FULL MARKDOWN OF ENERGIZED VARIANT"
+  "medium": "FULL MARKDOWN OF BALANCED ARTICLE"
 }
 ```
 
@@ -309,12 +351,12 @@ Run: `open http://localhost:5173/blog/{slug}`
 
 Report to user:
 ```
-✅ Energy variants generated
+✅ Tired variant generated
 📍 tones.json created at: public/data/blog/{slug}/tones.json
 🌐 Preview: http://localhost:5173/blog/{slug}
 
 Opening in your browser now...
-Test different energy levels to review variants.
+Test tired mode to review the slides variant.
 ```
 
 ---
@@ -340,7 +382,7 @@ Ask user: **"Variants are ready. Publish article? (yes/no)"**
 ```
 ✅ Article published!
 📍 Available at: /blog/{slug}
-📊 Variants: tired (slides), medium, energized
+📊 Variants: tired (slides), medium
 📦 Committed and pushed to origin
 🗄️ Scrape archived to: scrapes/archive/{scrape-folder-name}
 ```
@@ -369,7 +411,7 @@ Ask user: **"Variants are ready. Publish article? (yes/no)"**
 ✅ index.json updated
 ✅ All image references exist
 ✅ Preview renders without errors
-✅ All three tone variants aligned (same claims, different tone)
+✅ Both tone variants aligned (same claims, different tone)
 ✅ Tired mode uses slides format
 ✅ Source scrape archived to scrapes/archive/
 ✅ Changes committed and pushed to origin

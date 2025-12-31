@@ -137,11 +137,6 @@
   background: rgba(107, 155, 122, 0.1);
 }
 
-.option[data-level="energized"][data-selected="true"] {
-  border-color: #d4915c;
-  background: rgba(212, 145, 92, 0.1);
-}
-
 .optionIcon {
   font-size: 24px;
   flex-shrink: 0;

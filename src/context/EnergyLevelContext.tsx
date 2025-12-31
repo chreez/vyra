@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-export type EnergyLevel = 'tired' | 'medium' | 'energized';
+export type EnergyLevel = 'tired' | 'medium';
 
 interface EnergyLevelContextType {
   energyLevel: EnergyLevel | null;
@@ -8,6 +8,8 @@ interface EnergyLevelContextType {
   hasSelectedEnergy: boolean;
   showSplash: boolean;
   dismissSplash: () => void;
+  hasVariants: boolean;
+  setHasVariants: (value: boolean) => void;
 }
 
 const EnergyLevelContext = createContext<EnergyLevelContextType | null>(null);
@@ -25,6 +27,7 @@ export function EnergyLevelProvider({ children }: EnergyLevelProviderProps) {
   const [energyLevel, setEnergyLevelState] = useState<EnergyLevel | null>(null);
   const [showSplash, setShowSplash] = useState(false);
   const [hasSelectedEnergy, setHasSelectedEnergy] = useState(false);
+  const [hasVariants, setHasVariants] = useState(true); // Default true for non-article pages
 
   // Initialize from localStorage
   useEffect(() => {
@@ -63,6 +66,8 @@ export function EnergyLevelProvider({ children }: EnergyLevelProviderProps) {
         hasSelectedEnergy,
         showSplash,
         dismissSplash,
+        hasVariants,
+        setHasVariants,
       }}
     >
       {children}

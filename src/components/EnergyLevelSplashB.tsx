@@ -24,13 +24,6 @@ const ENERGY_OPTIONS: {
     tagline: 'Clear and straightforward',
     color: '#6b9b7a',
   },
-  {
-    level: 'energized',
-    icon: '⚡',
-    label: 'Energized',
-    tagline: 'Dynamic and engaging',
-    color: '#d4915c',
-  },
 ];
 
 export function EnergyLevelSplashB() {

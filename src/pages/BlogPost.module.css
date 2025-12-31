@@ -12,10 +12,6 @@
   background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
 }
 
-.page[data-energy="energized"] {
-  background: linear-gradient(180deg, #1f1f35 0%, #1a2545 100%);
-}
-
 /* Default fallback */
 .page:not([data-energy]) {
   background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);

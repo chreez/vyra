@@ -21,6 +21,16 @@
   border-color: var(--indicator-color);
 }
 
+.indicator[data-disabled="true"] {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.indicator[data-disabled="true"]:hover {
+  background: var(--bg-secondary);
+  border-color: var(--border);
+}
+
 .icon {
   font-size: 14px;
 }

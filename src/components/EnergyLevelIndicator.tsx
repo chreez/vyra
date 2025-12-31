@@ -5,15 +5,17 @@ import styles from './EnergyLevelIndicator.module.css';
 const ENERGY_CONFIG: Record<EnergyLevel, { label: string; icon: string; color: string }> = {
   tired: { label: 'Tired', icon: '🌙', color: '#7c6f9c' },
   medium: { label: 'Balanced', icon: '⚖️', color: '#6b9b7a' },
-  energized: { label: 'Energized', icon: '⚡', color: '#d4915c' },
 };
 
 export function EnergyLevelIndicator() {
-  const { energyLevel, setEnergyLevel } = useEnergyLevel();
+  const { energyLevel, setEnergyLevel, hasVariants } = useEnergyLevel();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const config = energyLevel ? ENERGY_CONFIG[energyLevel] : null;
+  // When no variants available, always show "Balanced" (medium)
+  const displayLevel = hasVariants ? energyLevel : 'medium';
+  const config = displayLevel ? ENERGY_CONFIG[displayLevel] : null;
+  const isDisabled = !hasVariants;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -37,19 +39,23 @@ export function EnergyLevelIndicator() {
     <div className={styles.wrapper} ref={dropdownRef}>
       <button
         className={styles.indicator}
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={isDisabled ? undefined : () => setIsOpen(!isOpen)}
         style={{ '--indicator-color': config.color } as React.CSSProperties}
-        aria-label={`Energy level: ${config.label}. Click to change.`}
-        aria-expanded={isOpen}
+        aria-label={isDisabled ? 'Energy level: Balanced (no variants available)' : `Energy level: ${config.label}. Click to change.`}
+        aria-expanded={isDisabled ? undefined : isOpen}
+        aria-disabled={isDisabled}
+        data-disabled={isDisabled}
       >
         <span className={styles.icon}>{config.icon}</span>
         <span className={styles.label}>{config.label}</span>
-        <span className={styles.chevron} data-open={isOpen}>
-          ▾
-        </span>
+        {!isDisabled && (
+          <span className={styles.chevron} data-open={isOpen}>
+            ▾
+          </span>
+        )}
       </button>
 
-      {isOpen && (
+      {isOpen && !isDisabled && (
         <div className={styles.dropdown}>
           {(Object.entries(ENERGY_CONFIG) as [EnergyLevel, typeof config][]).map(
             ([level, cfg]) => (

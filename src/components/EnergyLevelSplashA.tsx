@@ -17,12 +17,6 @@ const ENERGY_OPTIONS: { level: EnergyLevel; icon: string; label: string; descrip
     label: 'Balanced',
     description: 'Standard reading pace',
   },
-  {
-    level: 'energized',
-    icon: '⚡',
-    label: 'Energized',
-    description: 'Dynamic, engaging content',
-  },
 ];
 
 export function EnergyLevelSplashA() {
