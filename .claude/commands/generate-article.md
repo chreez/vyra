@@ -313,7 +313,7 @@ Convert the balanced article into slide format:
   "format": "slides",
   "slides": [
     "# Slide Title\n\nShort, gentle content for slide 1",
-    "## Key Point\n\nSimple explanation",
+    "## Key Point\n\nSimple explanation\n\n![Image description](/blog/{slug}/image.jpg)",
     ...
   ]
 }
@@ -323,6 +323,9 @@ Each slide should be:
 - One key idea
 - 2-4 sentences max
 - Soothing, low-stimulation language
+- Include relevant images using markdown syntax: `![alt text](/blog/{slug}/image.jpg)`
+- Images render inline in the slideshow via ReactMarkdown
+- Add images to slides that demonstrate exercises, diagrams, or key concepts
 
 ### Write tones.json
 
