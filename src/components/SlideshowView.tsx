@@ -22,6 +22,11 @@ function getSlideContent(slide: Slide): { title?: string; content: string } {
   return slide;
 }
 
+// Check if slide contains an image
+function hasImage(content: string): boolean {
+  return content.includes('![');
+}
+
 export function SlideshowView({ slides, articleTitle }: SlideshowViewProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState<'next' | 'prev' | null>(null);
@@ -119,6 +124,7 @@ export function SlideshowView({ slides, articleTitle }: SlideshowViewProps) {
 
   const currentSlide = getSlideContent(slides[currentIndex]);
   const progress = ((currentIndex + 1) / slides.length) * 100;
+  const isImageSlide = hasImage(currentSlide.content);
 
   return (
     <div
@@ -143,11 +149,12 @@ export function SlideshowView({ slides, articleTitle }: SlideshowViewProps) {
       </div>
 
       {/* Slide content - click to advance, double-click to go back */}
-      <div className={styles.slideContainer} onClick={handleClick}>
+      <div className={styles.slideContainer} onClick={handleClick} data-has-image={isImageSlide}>
         <div
           className={styles.slide}
           data-animating={isAnimating}
           data-direction={direction}
+          data-has-image={isImageSlide}
         >
           {currentSlide.title && (
             <h2 className={styles.slideTitle}>{currentSlide.title}</h2>
