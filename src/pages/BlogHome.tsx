@@ -110,11 +110,6 @@ export function BlogHome() {
       {showSplash && <IntroSplash onDismiss={handleDismiss} />}
 
       <Container size="lg" className={styles.container}>
-        <header className={styles.header}>
-          <Title order={1} className={styles.siteTitle}>Vyra</Title>
-          <Text className={styles.tagline}>Guides & Insights</Text>
-        </header>
-
         <div className={styles.filterBar}>
           <CategoryTabs
             categories={ALL_CATEGORIES}
