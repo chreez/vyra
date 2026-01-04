@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Container, Title, Text, Anchor, Loader } from '@mantine/core';
 import { IntroSplash } from '../components/IntroSplash';
+import { CategoryTabs, type Category } from '../components/CategoryTabs';
+import { SearchFAB } from '../components/SearchFAB';
 import styles from './BlogHome.module.css';
 
 // Version the key to bust cache when needed
@@ -20,10 +22,14 @@ interface BlogPost extends BlogMeta {
   slug: string;
 }
 
+const ALL_CATEGORIES: Category[] = ['all', 'health', 'finance', 'technology', 'education'];
+
 export function BlogHome() {
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
   const [showSplash, setShowSplash] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category>('all');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const dismissed = localStorage.getItem(STORAGE_KEY);
@@ -69,6 +75,26 @@ export function BlogHome() {
     loadPosts();
   }, []);
 
+  // Filter posts by category and search query
+  const filteredPosts = useMemo(() => {
+    return posts.filter((post) => {
+      // Category filter
+      if (selectedCategory !== 'all' && post.category.toLowerCase() !== selectedCategory) {
+        return false;
+      }
+      // Search filter (title + excerpt)
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        const matchesTitle = post.title.toLowerCase().includes(query);
+        const matchesExcerpt = post.excerpt.toLowerCase().includes(query);
+        if (!matchesTitle && !matchesExcerpt) {
+          return false;
+        }
+      }
+      return true;
+    });
+  }, [posts, selectedCategory, searchQuery]);
+
   if (loading) {
     return (
       <div className={styles.page}>
@@ -89,8 +115,26 @@ export function BlogHome() {
           <Text className={styles.tagline}>Guides & Insights</Text>
         </header>
 
+        <div className={styles.filterBar}>
+          <CategoryTabs
+            categories={ALL_CATEGORIES}
+            selected={selectedCategory}
+            onSelect={setSelectedCategory}
+          />
+          <SearchFAB value={searchQuery} onChange={setSearchQuery} />
+        </div>
+
         <main className={styles.articleList}>
-          {posts.map((post) => (
+          {filteredPosts.length === 0 ? (
+            <div className={styles.noResults}>
+              <Text className={styles.noResultsText}>
+                {searchQuery
+                  ? `No articles found for "${searchQuery}"`
+                  : `No articles in ${selectedCategory}`}
+              </Text>
+            </div>
+          ) : null}
+          {filteredPosts.map((post) => (
             <article key={post.slug} className={styles.article}>
               <div className={styles.articleMeta}>
                 <Text className={styles.category}>{post.category.toUpperCase()}</Text>
