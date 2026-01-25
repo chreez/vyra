@@ -209,6 +209,8 @@ This guide is based on the video by [Creator Name].
 }
 ```
 
+**IMPORTANT:** Use today's actual date for the `date` field. Check the current year in your environment context.
+
 ### Copy Images
 
 Using the Image Curator results:
@@ -294,10 +296,16 @@ Return confirmation when complete."
 lsof -i :5173 || npm run dev &
 ```
 
-### Verify with Chrome DevTools
+### Verify Article Page
 1. `mcp__chrome-devtools__navigate_page` → `http://localhost:5173/blog/{slug}`
-2. `mcp__chrome-devtools__take_snapshot` → verify renders
-3. `mcp__chrome-devtools__list_console_messages` → check errors
+2. `mcp__chrome-devtools__take_snapshot` → verify article renders
+3. `mcp__chrome-devtools__list_console_messages` → check for errors
+
+### Verify Blog Home Listing
+1. `mcp__chrome-devtools__navigate_page` → `http://localhost:5173/`
+2. `mcp__chrome-devtools__take_snapshot` → verify new article appears in list
+3. Confirm article title, category, and date are correct
+4. If article not visible: check `published: true` in meta.json, verify slug in index.json
 
 ### Open Browser
 ```bash
@@ -345,11 +353,12 @@ open http://localhost:5173/blog/{slug}
 ✅ Sources cited with context
 ✅ Hero image selected
 ✅ Descriptive image filenames
-✅ Valid metadata JSON
+✅ Valid metadata JSON (correct date!)
 ✅ Complete YouTube attribution
 ✅ index.json updated
 ✅ All image references exist
-✅ Preview renders without errors
+✅ Article page renders without errors
+✅ Article appears on blog home listing
 ✅ Both tone variants aligned
 ✅ Tired mode uses slides format
 ✅ Source scrape archived
