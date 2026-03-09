@@ -20,7 +20,8 @@ You are processing a YouTube video scrape into a blog article with automated pre
 3. Generate balanced article + images
 4. Deploy to preview
 5. Generate tired variant
-6. Verify & publish
+6. Review agent (source fidelity check)
+7. Verify & publish
 
 ---
 
@@ -289,7 +290,72 @@ Return confirmation when complete."
 
 ---
 
-## Step 6: Verify & Publish
+## Step 6: Review Agent (Source Fidelity Check)
+
+**Launch a review sub-agent to cross-reference the article against original source material:**
+
+```
+Use Task tool with subagent_type="general-purpose":
+
+Prompt: "You are a review agent. Cross-reference a generated article against its original source material to find discrepancies.
+
+Read these files:
+- public/data/blog/{slug}/article.md (the generated article)
+- public/data/blog/{slug}/meta.json (article metadata)
+- {scrapePath}/transcript.txt (original video transcript)
+- {scrapePath}/video-context.json (if exists)
+
+Perform these checks:
+
+1. **Name & Terminology Fidelity**
+   Compare every proper noun, product name, tool name, and branded term in the article against the transcript. Flag:
+   - Names that were 'normalized' or autocorrected (e.g. transcript says 'Clawdbot' but article says 'Cloudbot')
+   - Names not found anywhere in the transcript (possible hallucinations)
+   - Inconsistent naming within the article itself
+
+2. **Claim Verification**
+   For each factual claim in the article, verify it appears in the transcript. Flag:
+   - Claims with no transcript basis
+   - Numbers, prices, or stats that differ from the transcript
+   - Exaggerated or softened claims vs the original
+
+3. **Omission Check**
+   Identify any major points from the transcript that the article omits entirely.
+
+Return a structured report:
+{
+  'namingIssues': [
+    {'article': 'Cloudbot', 'transcript': 'Clawdbot', 'occurrences': 41, 'severity': 'high'}
+  ],
+  'claimIssues': [
+    {'claim': '...', 'issue': 'not in transcript / differs from transcript', 'severity': 'high|medium|low'}
+  ],
+  'omissions': [
+    {'topic': '...', 'severity': 'medium|low'}
+  ],
+  'summary': 'One paragraph overall assessment'
+}
+
+Do NOT modify any files. Review only."
+```
+
+### Handle Review Results
+
+**If issues with severity=high exist:**
+
+- If NOT autoMode: Present the report and ask user how to proceed
+- If autoMode: Log the report as a warning but continue (high-severity naming issues should still be flagged to the user even in auto mode)
+
+**If only medium/low issues:** Note them in the final report and proceed.
+
+**Apply fixes:** If the user approves fixes (or autoMode with no high-severity), apply corrections to:
+- `public/data/blog/{slug}/article.md`
+- `public/data/blog/{slug}/meta.json` (title, excerpt)
+- `public/data/blog/{slug}/tones.json` (tired slides)
+
+---
+
+## Step 7: Verify & Publish
 
 ### Start Dev Server (if needed)
 ```bash
@@ -361,5 +427,7 @@ open http://localhost:5173/blog/{slug}
 ✅ Article appears on blog home listing
 ✅ Both tone variants aligned
 ✅ Tired mode uses slides format
+✅ Review agent passed (no high-severity issues)
+✅ Proper nouns match source transcript
 ✅ Source scrape archived
 ✅ Changes committed and pushed
